@@ -35,7 +35,7 @@ def save_to_sql(df):
             fast_executemany=True
         )
 
-        # Đọc dữ liệu hiện có (nếu bảng đã tồn tại)
+        # Đọc dữ liệu hiện có 
         existing = pd.read_sql("SELECT date FROM dbo.FPT_Stock", con=engine)
         existing['date'] = pd.to_datetime(existing['date'])
 
@@ -46,7 +46,7 @@ def save_to_sql(df):
             print("✅ Dữ liệu đã được cập nhật, không có gì mới.")
             return
 
-        # Ghi thêm dữ liệu mới (append)
+        # Ghi thêm dữ liệu mới 
         new_data.to_sql("FPT_Stock", con=engine, schema="dbo",
                         if_exists="append", index=False, method="multi", chunksize=1000)
         print(f"✅ Đã thêm {len(new_data)} dòng dữ liệu mới vào SQL Server!")
@@ -90,12 +90,13 @@ def display_stock_analysis(df):
     for col in ['open', 'high', 'low', 'close']:
         df_show[col] = df_show[col].apply(lambda x: f"{x:,.0f}")
     df_show['volume'] = df_show['volume'].apply(lambda x: f"{x:,.0f}")
-    print(df_show.tail(10).to_string(index=False))  # chỉ in 10 dòng gần nhất
+    print(df_show.tail(10).to_string(index=False))  
 
-# ------------------------- MAIN -------------------------
+# MAIN 
 if __name__ == "__main__":
     df = get_stock_data(symbol="FPT", days=1825)
     
     if not df.empty:
         display_stock_analysis(df)
         save_to_sql(df)
+
