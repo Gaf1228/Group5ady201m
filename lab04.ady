@@ -11,7 +11,7 @@ def get_engine():
         fast_executemany=True
     )
 
-# ==== LẤY DỮ LIỆU ====
+# LẤY DỮ LIỆU 
 def get_stock_data_range(symbol, start, end):
     f = Vnstock().stock(symbol=symbol, source="VCI")
     df = f.quote.history(start=start, end=end)  # trả về DataFrame ngày
@@ -23,7 +23,7 @@ def get_stock_data_range(symbol, start, end):
     df = df.sort_values("date").reset_index(drop=True)
     return df
 
-# ==== TRUY VẤN DB ====
+# TRUY VẤN DB
 def get_max_date_in_db(engine, table="FPT_Stock"):
     try:
         with engine.connect() as conn:
@@ -42,7 +42,7 @@ def replace_overlap_and_append(engine, df_new, table="FPT_Stock", cutoff_date=No
             )
     df_new.to_sql(table, con=engine, if_exists="append", index=False)
 
-# ==== HIỂN THỊ NGÀY MỚI NHẤT ====
+#  HIỂN THỊ NGÀY MỚI NHẤT 
 def display_latest_from_db(engine, table="FPT_Stock"):
     # Lấy 2 dòng mới nhất để tính % thay đổi
     q = f"SELECT TOP 2 * FROM {table} ORDER BY [date] DESC"
@@ -63,13 +63,13 @@ def display_latest_from_db(engine, table="FPT_Stock"):
         price_change = 0
         percent_change = 0.0
 
-    print("🚀 PHÂN TÍCH CỔ PHIẾU FPT (ngày gần nhất)")
+    print(" PHÂN TÍCH CỔ PHIẾU FPT (ngày gần nhất)")
     print("=" * 50)
-    print(f"📅 Ngày: {latest['date'].strftime('%d/%m/%Y')}")
-    print(f"📊 Giá đóng cửa: {current_price:,.0f} VND")
-    print(f"📈 Thay đổi: {price_change:+,.0f} VND ({percent_change:+.2f}%)")
+    print(f" Ngày: {latest['date'].strftime('%d/%m/%Y')}")
+    print(f" Giá đóng cửa: {current_price:,.0f} VND")
+    print(f" Thay đổi: {price_change:+,.0f} VND ({percent_change:+.2f}%)")
     print(f"🔼 Cao nhất: {latest['high']:,.0f} | 🔽 Thấp nhất: {latest['low']:,.0f}")
-    print(f"📦 Khối lượng: {latest['volume']:,.0f}")
+    print(f" Khối lượng: {latest['volume']:,.0f}")
     print("=" * 50)
 
 # ==== MAIN: CHỈ CẬP NHẬT PHẦN MỚI ====
@@ -85,21 +85,21 @@ if __name__ == "__main__":
         start = (datetime.today() - timedelta(days=1825)).strftime("%Y-%m-%d")
         df_full = get_stock_data_range(symbol, start, today)
         if df_full.empty:
-            print("❌ Không có dữ liệu.")
+            print(" Không có dữ liệu.")
         else:
             # tạo mới toàn bộ
             df_full.to_sql("FPT_Stock", con=engine, if_exists="replace", index=False)
-            print(f"✅ Khởi tạo bảng với {len(df_full):,} dòng.")
+            print(f" Khởi tạo bảng với {len(df_full):,} dòng.")
     else:
         # Các lần sau: chỉ lấy từ last_date lùi 5 ngày để ghi đè
         overlap_days = 5
         start = (last_date - timedelta(days=overlap_days)).strftime("%Y-%m-%d")
         df_inc = get_stock_data_range(symbol, start, today)
         if df_inc.empty:
-            print("ℹ️ Không có dữ liệu mới.")
+            print(" Không có dữ liệu mới.")
         else:
             replace_overlap_and_append(engine, df_inc, cutoff_date=start)
-            print(f"✅ Cập nhật {len(df_inc):,} dòng mới/ghi đè phần chồng lấn từ {start}.")
+            print(f" Cập nhật {len(df_inc):,} dòng mới/ghi đè phần chồng lấn từ {start}.")
 
     # In ra ngày gần nhất (không cần load 5 năm)
     display_latest_from_db(engine)
@@ -123,5 +123,6 @@ dtype_df = pd.DataFrame({
     "n_unique": [df[c].nunique(dropna=True) for c in df.columns],
 })
 dtype_df
+
 
 
